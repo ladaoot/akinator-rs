@@ -18,12 +18,19 @@
     <div class="container">
         <h1>Game</h1>
 
-        <p id="qus"></p>
+        <div id="q"></div>
+        <div id="a"></div>
 
         <div class="row">
-            <button onclick="game()">Start Game</button>
-            <button onclick="goBack()">Go Back</button>
-            <button onclick="endGame()">End</button>
+            <button class="game_btn" onclick="answer(1)">Yes</button>
+            <button class="game_btn" onclick="answer(0)">No</button>
+        </div>
+
+        <div class="row">
+            <button onclick="game(0)">Start Game</button>
+            <button class="back" onclick="goBack()">Go Back</button>
+            <!-- <button onclick="endGame()">End</button> -->
+            <button onclick="restart()">Restart</button>
         </div>
     </div>
 </body>

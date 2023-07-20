@@ -1,11 +1,6 @@
 const { invoke } = window.__TAURI__.tauri;
 
-var questionDiv = document.getElementById("qus");;
-// questionDiv.textContent = 'Я новое текстовое содержимое' ;
 
-// window.addEventListener("DOMContentLoaded", () => {
-//     questionDiv = document.querySelector("#qus");
-//   });
 
 function start() {
     var xhr = new XMLHttpRequest();
@@ -26,17 +21,17 @@ function start() {
 
 }
 
-async function game() {
-    'use strict';
+async function game(x) {
+    const btn = document.querySelectorAll(".game_btn");
+    btn[0].style.display = 'block';
+    btn[1].style.display = 'block';
+    if (x===0) {
+        restart();
+    } else {
+        const Div = document.querySelector("#q");
+        Div.textContent = await invoke("question");
+    }
 
-    const div = document.createElement("div");
-
-    div.classList.add('black');
-
-    document.body.append(div);
-
-    // Вставка текста в тег div
-    div.textContent = await invoke("question");
 }
 
 function goBack() {
@@ -61,12 +56,32 @@ function endGame() {
     xhr.send();
 }
 
-// window.addEventListener("DOMContentLoaded", () => {
-// //  greetInputEl = document.querySelector("#greet-input");
-// //  greetMsgEl = document.querySelector("#greet-msg");
-// //  document.querySelector("#start-form").addEventListener("submit", (e) => {
-// //    e.preventDefault();
-// //    greet();
+async function answer(x) {
+    const Div = document.querySelector("#a");
 
-// //   });
-// });
+    const get = await invoke('check', { answer: x });
+    if (get.length === 1) {
+        cleanQuestion();
+        Div.textContent = 'I guess it is ' + get[0];
+    } else if (get.length === 0) {
+        cleanQuestion();
+        Div.textContent = 'I cant guess... :('
+
+    } else {
+        game(1);
+    }
+}
+
+function cleanQuestion() {
+    const Div = document.querySelector("#q");
+    Div.textContent = "";
+}
+
+async function restart() {
+    const Div = document.querySelector("#a");
+    Div.textContent = "";
+    await invoke('restart');
+    game(1);
+}
+
+
