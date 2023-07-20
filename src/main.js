@@ -3,21 +3,7 @@ const { invoke } = window.__TAURI__.tauri;
 
 
 function start() {
-    var xhr = new XMLHttpRequest();
-
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            document.body.innerHTML = xhr.responseText;
-
-            var backButton = document.querySelector('.back');
-            backButton.addEventListener('click', goBack);
-        } else {
-            console.log('Error loading game.html. Status code: ' + xhr.status);
-        }
-    };
-
-    xhr.open('GET', 'game.html', true);
-    xhr.send();
+    window.location.href='game.html';
 
 }
 
@@ -35,26 +21,9 @@ async function game(x) {
 }
 
 function goBack() {
-    window.location.reload();
+    window.history.back();
 }
 
-function endGame() {
-    var xhr = new XMLHttpRequest();
-
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            document.body.innerHTML = xhr.responseText;
-
-            var backButton = document.querySelector('.back');
-            backButton.addEventListener('click', goBack);
-        } else {
-            console.log('Error loading end.html. Status code: ' + xhr.status);
-        }
-    };
-
-    xhr.open('GET', 'end.html', true);
-    xhr.send();
-}
 
 async function answer(x) {
     const Div = document.querySelector("#a");

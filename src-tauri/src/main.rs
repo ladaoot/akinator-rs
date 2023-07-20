@@ -9,9 +9,8 @@
 
 // use core::num::dec2flt::number::Number;
 use rand::seq::SliceRandom;
-use rand::Rng;
 use serde::{Deserialize, Serialize};
-use std::{path::PathBuf, sync::Arc};
+use std::path::PathBuf;
 
 static mut ALREADY_ASKED: Vec<u64> = Vec::new();
 static mut ACTUAL_PERSON: Vec<Person> = Vec::new();
@@ -68,8 +67,6 @@ fn question() -> String {
                     .unwrap(),
             );
         }
-
-        println!("{:?}", ALREADY_ASKED);
 
         q.unwrap()
     }
@@ -147,10 +144,6 @@ fn isStart() -> bool {
 
 fn main() {
     get_all_persons();
-
-    unsafe {
-        println!("{:?}", ACTUAL_PERSON);
-    }
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![question, check, restart, isStart])
