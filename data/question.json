@@ -74,5 +74,9 @@
   {
     "id": 19,
     "text": "Is your character below the age of 25?"
+  },
+  {
+    "id": 20,
+    "text": "Ваш персонаж из России?"
   }
 ]

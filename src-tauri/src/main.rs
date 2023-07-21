@@ -1,13 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-// #[tauri::command]
-// fn greet(name: &str) -> String {
-//     format!("Hello, {}! You've been greeted from Rust!", name)
-// }
-
-// use core::num::dec2flt::number::Number;
 use rand::seq::SliceRandom;
 use serde::ser::SerializeStruct;
 use serde::{Deserialize, Serialize};
@@ -44,7 +37,7 @@ impl Serialize for Person {
 }
 
 fn get_all_question() -> Vec<Question> {
-    let questions_path: PathBuf = ["../src", "assets", "question.json"].iter().collect();
+    let questions_path: PathBuf = ["../data", "question.json"].iter().collect();
 
     let questions_json =
         std::fs::read_to_string(&questions_path).expect("Failed to read questions file");
@@ -87,8 +80,8 @@ fn question() -> String {
 }
 
 fn get_all_persons() {
-    let person_path: PathBuf = ["../src", "assets", "persons.json"].iter().collect();
-    let person_json = std::fs::read_to_string(&person_path).expect("Failed to read person file");
+    let person_path: PathBuf = ["../data", "persons.json"].iter().collect();
+    let person_json = std::fs::read_to_string(&person_path).expect("Failed to read persons file");
     let values: Vec<serde_json::Value> = serde_json::from_str(&person_json).unwrap();
     let persons = values
         .iter()
@@ -169,15 +162,14 @@ fn save(name: String) {
             name: name,
             questions: YES_QYESTION.clone(),
         };
-        // let s = serde_json::to_value(per).unwrap().to_string();
-        let person_path: PathBuf = ["../src", "assets", "persons.json"].iter().collect();
+        let person_path: PathBuf = ["../data", "persons.json"].iter().collect();
 
         println!("{}", per.name);
         println!("{:?}", YES_QYESTION);
         println!("{:?}", per.questions);
 
         let mut person_json =
-            std::fs::read_to_string(&person_path).expect("Failed to read questions file");
+            std::fs::read_to_string(&person_path).expect("Failed to read persons file");
         person_json.pop();
         person_json.pop();
         person_json.push_str(
@@ -199,10 +191,15 @@ fn cleanYes() {
     }
 }
 
+#[tauri::command]
+fn isYesEmpty() -> bool {
+    unsafe { YES_QYESTION.is_empty() }
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            question, check, restart, isStart, save, cleanYes
+            question, check, restart, isStart, save, cleanYes, isYesEmpty
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
