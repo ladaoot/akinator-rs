@@ -3,7 +3,7 @@ const { invoke } = window.__TAURI__.tauri;
 
 function start() {
     window.location.href = 'game.html';
-    game(0);
+    // game(0);
 
 }
 

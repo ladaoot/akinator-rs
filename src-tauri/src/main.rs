@@ -1,21 +1,31 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use rand::seq::SliceRandom;
-use serde::ser::SerializeStruct;
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fs::write;
 use std::path::PathBuf;
+use std::sync::Mutex;
 
 static mut ALREADY_ASKED: Vec<u64> = Vec::new();
 static mut ACTUAL_PERSON: Vec<Person> = Vec::new();
 static mut FLAG: bool = false;
 static mut YES_QYESTION: Vec<u64> = Vec::new();
+static mut QUESTION_MAP: Lazy<Mutex<HashMap<String, Vec<Question>>>> = Lazy::new(|| {
+    let m: HashMap<String, Vec<Question>> = HashMap::new();
+    Mutex::new(m)
+});
+static mut TITLE: Lazy<Vec<String>> = Lazy::new(|| vec!["general".to_string()]);
+static mut YES_NEXT_TITLE: Lazy<Vec<String>> = Lazy::new(|| vec!["general".to_string()]);
+static mut NO_NEXT_TITLE: Lazy<Vec<String>> = Lazy::new(|| vec!["general".to_string()]);
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct Question {
     text: String,
     id: u64,
+    yes: Option<String>,
+    no: Option<String>,
 }
 
 #[derive(Deserialize, Clone, Debug)]
@@ -24,58 +34,78 @@ struct Person {
     questions: Vec<u64>,
 }
 
-impl Serialize for Person {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut s = serializer.serialize_struct("Person", 2)?;
-        s.serialize_field("name", &self.name)?;
-        s.serialize_field("questions", &self.questions)?;
-        s.end()
-    }
-}
-
-fn get_all_question() -> Vec<Question> {
+fn get_all_question() {
     let questions_path: PathBuf = ["../data", "question.json"].iter().collect();
 
     let questions_json =
         std::fs::read_to_string(&questions_path).expect("Failed to read questions file");
 
     let values: Vec<serde_json::Value> = serde_json::from_str(&questions_json).unwrap();
-    values
-        .iter()
-        .map(|x| -> Question {
-            let q = x.as_object().unwrap();
-            Question {
-                text: q.get("text").unwrap().as_str().unwrap().to_string(),
-                id: q.get("id").unwrap().as_u64().unwrap(),
-            }
-        })
-        .collect::<Vec<_>>()
+
+    let mut map: HashMap<String, Vec<Question>> = HashMap::new();
+
+    for i in values {
+        let t = i.as_object().unwrap().clone();
+        let title = t.get("title").unwrap().as_str().unwrap().to_string();
+        let mut v = Vec::new();
+        let que = t.get("questions").unwrap().as_array().unwrap().clone();
+        for q in que {
+            let ob = q.as_object().unwrap().clone();
+            let yes = match ob.get("yes") {
+                Some(x) => Some(x.as_str().unwrap().to_string()),
+                None => None,
+            };
+            let no = match ob.get("no") {
+                Some(x) => Some(x.as_str().unwrap().to_string()),
+                None => None,
+            };
+            v.push(Question {
+                text: ob.get("q").unwrap().as_str().unwrap().to_string(),
+                id: ob.get("id").unwrap().as_u64().unwrap(),
+                yes,
+                no,
+            })
+        }
+        map.insert(title, v);
+    }
+
+    unsafe {
+        let c = QUESTION_MAP.get_mut().unwrap();
+        for (k, v) in map {
+            c.insert(k, v);
+        }
+    }
 }
 
 #[tauri::command]
 fn question() -> String {
-    let data = get_all_question();
     unsafe {
-        let fil = data
-            .iter()
-            .filter(|x| !ALREADY_ASKED.contains(&x.id))
-            .map(|x| x.text.clone())
-            .collect::<Vec<_>>();
-
-        let q = fil.choose(&mut rand::thread_rng()).cloned();
-        if let Some(qu) = q.clone() {
-            ALREADY_ASKED.push(
-                data.iter()
-                    .filter(|x| x.text.eq_ignore_ascii_case(qu.as_str()))
-                    .map(|x| x.id)
-                    .max()
-                    .unwrap(),
-            );
+        let question = QUESTION_MAP.get_mut().unwrap();
+        if question.len() == 0 {
+            get_all_question()
         }
-        q.unwrap()
+        println!("{:?}", TITLE.get(0).unwrap());
+        let mut vec = question.get_mut(TITLE.get(0).unwrap()).unwrap();
+        let q = vec.remove(0);
+        // question.;
+        ALREADY_ASKED.push(q.id);
+
+        match q.yes {
+            Some(x) => {
+                YES_NEXT_TITLE.pop();
+                YES_NEXT_TITLE.push(x)
+            }
+            None => {}
+        }
+        match q.no {
+            Some(x) => {
+                NO_NEXT_TITLE.pop();
+                NO_NEXT_TITLE.push(x)
+            }
+            None => {}
+        }
+
+        q.text
     }
 }
 
@@ -121,6 +151,7 @@ fn check(answer: u8) -> Vec<String> {
                 let q = ALREADY_ASKED.last().unwrap();
                 let ret = x.questions.contains(q);
                 if answer == 1 {
+                    // println!("{:?}", TITLE);
                     ret
                 } else {
                     !ret
@@ -134,8 +165,13 @@ fn check(answer: u8) -> Vec<String> {
         }
         if answer == 1 {
             YES_QYESTION.push(*(ALREADY_ASKED.last().unwrap()));
+            TITLE.pop();
+            TITLE.push(YES_NEXT_TITLE.get(0).unwrap().clone());
+        } else {
+            TITLE.pop();
+            TITLE.push(NO_NEXT_TITLE.get(0).unwrap().clone());
         }
-        println!("{:?}", YES_QYESTION);
+
         d.iter().map(|x| x.name.clone()).collect()
     }
 }
@@ -147,6 +183,13 @@ fn restart() {
         ALREADY_ASKED = Vec::new();
         ACTUAL_PERSON = Vec::new();
         YES_QYESTION = Vec::new();
+        QUESTION_MAP = Lazy::new(|| {
+            let m: HashMap<String, Vec<Question>> = HashMap::new();
+            Mutex::new(m)
+        });
+        TITLE = Lazy::new(|| vec!["general".to_string()]);
+        YES_NEXT_TITLE = Lazy::new(|| vec!["general".to_string()]);
+        NO_NEXT_TITLE = Lazy::new(|| vec!["general".to_string()]);
     }
 }
 
@@ -163,10 +206,6 @@ fn save(name: String) {
             questions: YES_QYESTION.clone(),
         };
         let person_path: PathBuf = ["../data", "persons.json"].iter().collect();
-
-        println!("{}", per.name);
-        println!("{:?}", YES_QYESTION);
-        println!("{:?}", per.questions);
 
         let mut person_json =
             std::fs::read_to_string(&person_path).expect("Failed to read persons file");

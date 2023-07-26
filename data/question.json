@@ -1,82 +1,98 @@
 [
   {
-    "id": 1,
-    "text": "Is your character American?"
+    "title": "general",
+    "questions": [
+      {
+        "id": 1,
+        "q": "Загаданный вами человек мужчина?"
+      },
+      {
+        "id": 2,
+        "q": "Загаданный вами человек жив?"
+      },
+      {
+        "id": 3,
+        "q": "Загаданный вами человек из России?",
+        "no": "countries"
+      },
+      {
+        "id": 4,
+        "q": "Загаданный вами человек знаменит?",
+        "yes": "celebrities"
+      },
+      {
+        "id": 5,
+        "q": "Знакомы ли вы с загаданным вами человеком?",
+        "yes": "know"
+      }
+    ]
   },
   {
-    "id": 2,
-    "text": "Is your character European?"
+    "title": "countries",
+    "questions": [
+      {
+        "id": 100,
+        "q": "Загаданный вами человек из Америки?",
+        "yes": "general",
+        "no": "general"
+      }
+    ]
   },
   {
-    "id": 3,
-    "text": "Does your character's stage name consist of 2 letters?"
+    "title": "celebrities",
+    "questions": [
+      {
+        "id": 200,
+        "q": "Загаданный вами человек актер?",
+        "yes": "personal"
+      },
+      {
+        "id": 201,
+        "q": "Загаданный вами человек певец?",
+        "yes": "personal"
+      },
+      {
+        "id": 202,
+        "q": "Загаданный вами человек ученый?",
+        "yes": "personal"
+      },
+      {
+        "id": 203,
+        "q": "Загаданный вами человек политик?",
+        "yes": "personal",
+        "no": "personal"
+      }
+    ]
   },
   {
-    "id": 4,
-    "text": "Is your character a rapper?"
+    "title": "know",
+    "questions": [
+      {
+        "id": 300,
+        "q": "Загаданный вами человек связан с учебой?",
+        "yes": "personal"
+      }
+    ]
   },
   {
-    "id": 5,
-    "text": "Is your character a singer?"
-  },
-  {
-    "id": 6,
-    "text": "Does your character usually wear a hoodie?"
-  },
-  {
-    "id": 7,
-    "text": "Does your character have a face tattoo?"
-  },
-  {
-    "id": 8,
-    "text": "Does your character have a tattoo?"
-  },
-  {
-    "id": 9,
-    "text": "Does your character's stage name consist of 2 words?"
-  },
-  {
-    "id": 10,
-    "text": "Is your character known for blending multiple genres?"
-  },
-  {
-    "id": 11,
-    "text": "Did your character create a word?"
-  },
-  {
-    "id": 12,
-    "text": "Is your character black?"
-  },
-  {
-    "id": 13,
-    "text": "Is your character white?"
-  },
-  {
-    "id": 14,
-    "text": "Is your character gay?"
-  },
-  {
-    "id": 15,
-    "text": "Was your character born in London?"
-  },
-  {
-    "id": 16,
-    "text": "Is your charcter above the age of 30?"
-  },
-  {
-    "id": 17,
-    "text": "Did your character have blond hair at one point?"
-  },
-  {
-    "id": 18,
-    "text": "Was your character born in the United States?"
-  },
-  {
-    "id": 19,
-    "text": "Is your character below the age of 25?"
-  },
-  {
-    "id": 20,
-    "text": "Ваш персонаж из России?"
+    "title": "personal",
+    "questions": [
+      {
+        "id": 400,
+        "q": "Загаданный вами человек старше 30?"
+      },
+      {
+        "id": 401,
+        "q": "У загаданного вами человека есть дети?"
+      },
+      {
+        "id": 402,
+        "q": "У загаданного вами человека темные волосы?"
+      },
+      {
+        "id":403,
+        "q": "Загаданный вами человек страдает от неизлечимого заболевания?"
+      }
+    ]
   }
 ]
