@@ -5,6 +5,7 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::write;
+use std::io::Error;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
@@ -32,6 +33,12 @@ struct Question {
 struct Person {
     name: String,
     questions: Vec<u64>,
+}
+
+impl PartialEq for Person {
+    fn eq(&self, other: &Self) -> bool {
+        self.name.eq_ignore_ascii_case(other.name.as_str()) || self.questions == other.questions
+    }
 }
 
 fn get_all_question() {
@@ -84,10 +91,9 @@ fn question() -> String {
         if question.len() == 0 {
             get_all_question()
         }
-        println!("{:?}", TITLE.get(0).unwrap());
+
         let mut vec = question.get_mut(TITLE.get(0).unwrap()).unwrap();
         let q = vec.remove(0);
-        // question.;
         ALREADY_ASKED.push(q.id);
 
         match q.yes {
@@ -95,14 +101,20 @@ fn question() -> String {
                 YES_NEXT_TITLE.pop();
                 YES_NEXT_TITLE.push(x)
             }
-            None => {}
+            None => {
+                YES_NEXT_TITLE.pop();
+                YES_NEXT_TITLE.push(TITLE.get(0).unwrap().clone())
+            }
         }
         match q.no {
             Some(x) => {
                 NO_NEXT_TITLE.pop();
                 NO_NEXT_TITLE.push(x)
             }
-            None => {}
+            None => {
+                NO_NEXT_TITLE.pop();
+                NO_NEXT_TITLE.push(TITLE.get(0).unwrap().clone())
+            }
         }
 
         q.text
@@ -151,7 +163,6 @@ fn check(answer: u8) -> Vec<String> {
                 let q = ALREADY_ASKED.last().unwrap();
                 let ret = x.questions.contains(q);
                 if answer == 1 {
-                    // println!("{:?}", TITLE);
                     ret
                 } else {
                     !ret
@@ -172,7 +183,15 @@ fn check(answer: u8) -> Vec<String> {
             TITLE.push(NO_NEXT_TITLE.get(0).unwrap().clone());
         }
 
-        d.iter().map(|x| x.name.clone()).collect()
+        let mut answ: Vec<String> = d.iter().map(|x| x.name.clone()).collect();
+        if YES_QYESTION.len() < 15 && *ALREADY_ASKED.last().unwrap()!=404{
+            answ.push("none".to_string());
+            answ.push("none".to_string());
+
+        }
+        println!("{:?}", answ);
+        println!("asked {}, yes {}", ALREADY_ASKED.len(), YES_QYESTION.len());
+        answ
     }
 }
 
@@ -199,12 +218,18 @@ fn isStart() -> bool {
 }
 
 #[tauri::command]
-fn save(name: String) {
+fn save(name: String) -> Result<String, String> {
     unsafe {
         let per = Person {
             name: name,
             questions: YES_QYESTION.clone(),
         };
+
+        get_all_persons();
+        if ACTUAL_PERSON.contains(&per) {
+            return Result::Ok("alredy exists".to_string());
+        }
+
         let person_path: PathBuf = ["../data", "persons.json"].iter().collect();
 
         let mut person_json =
@@ -219,7 +244,8 @@ fn save(name: String) {
             .as_str(),
         );
         person_json.push(']');
-        write(person_path, person_json).expect("Cannot write");
+        write(person_path, person_json).expect("Can't write to file");
+        return Result::Ok("ok".to_string());
     }
 }
 

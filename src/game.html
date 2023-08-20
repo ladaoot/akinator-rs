@@ -15,21 +15,25 @@
 
 <body>
     <script src="/main.js"></script>
+    <script>
+        window.onload = game(0);
+    </script>
     <div class="container">
         <h1>Game</h1>
 
         <div id="q"></div>
         
         <div class="row">
-            <button class="game_btn" onclick="answer(1)">Yes</button>
-            <button class="game_btn" onclick="answer(0)">No</button>
+            <button class="game_btn" onclick="answer(1)">Да</button>
+            <button class="game_btn" onclick="answer(0)">Нет</button>
+            <button class="answ_btn" onclick="win()">Да, ты отгадал</button>
+            <button class="answ_btn" onclick="loss()">Нет, ты не отгадал</button>
         </div>
 
         <div class="row">
-            <button onclick="game(0)">Start Game</button>
-            <button class="back" onclick="goBack()">Go Back</button>
-            <button onclick="restart()">Restart</button>
-            <button class="game_btn" onclick="add()">Add</button>
+            <button class="back" onclick="goBack()">Вернуться назад</button>
+            <button onclick="restart()">Перезапустить</button>
+            <button class="game_btn" onclick="add()">Добавить</button>
         </div>
     </div>
 </body>

@@ -2,8 +2,11 @@ const { invoke } = window.__TAURI__.tauri;
 
 
 function start() {
+    // game(1);
+    window.onload = game(0);
     window.location.href = 'game.html';
-    // game(0);
+
+
 
 }
 
@@ -22,6 +25,8 @@ async function game(x) {
     btn[1].disabled = false;
 
 
+
+
 }
 
 function goBack() {
@@ -35,13 +40,16 @@ async function answer(x) {
     const btn = document.querySelectorAll(".game_btn");
     const get = await invoke('check', { answer: x });
     if (get.length === 1) {
-        Div.textContent = 'I guess it is ' + get[0];
-        btn[0].disabled = true;
-        btn[1].disabled = true;
+        Div.textContent = 'Я думаю это ' + get[0];
+        btn[0].style.display = 'none';
+        btn[1].style.display = 'none';
+        const ans = document.querySelectorAll(".answ_btn")
+        ans[0].style.display = 'block';
+        ans[1].style.display = 'block';
     } else if (get.length === 0) {
-        Div.textContent = "I cant guess... :(\nIf you want to add a person press ADD-button";
-        btn[0].disabled = true;
-        btn[1].disabled = true;
+        Div.textContent = `Я не могу понять кто это...  Если вы хотите добавить человека, то нажмите на кнопку \"Добавить\"`;
+        btn[0].style.display = 'none';
+        btn[1].style.display = 'none';
         btn[2].style.display = 'block';
 
     } else {
@@ -72,15 +80,38 @@ async function save() {
         if (enterName === '') {
             Div.textContent = 'You dont enter anything';
         } else {
-            await invoke('save', { name: enterName });
+            let add = await invoke('save', { name: enterName });
+            if (add == 'ok') {
+                Div.textContent = 'Добавили ' + enterName + ' в базу. Теперь я могу отгадать этого человека. Чтобы проверить нажмите "Вернуться назад".';
+                await invoke('cleanYes');
+            } else {
+                Div.textContent = 'Это человек уже есть в базе. Хотите попробовать его отгадать?'
 
-            Div.textContent = 'Add ' + enterName + ' to json';
-            await invoke('cleanYes');
+            }
+
         }
 
     } else {
-        Div.textContent = 'I cant add this person. there is no question for this person.'
+        Div.textContent = 'Я не могу добавить это человека, нет вопросов к которым бы он подходил.'
     }
 
+}
+
+function win() {
+    const Div = document.querySelector("#q");
+    Div.textContent = 'Ура я отгадал!!!';
+    const ans = document.querySelectorAll('.answ_btn');
+    ans[0].style.display = 'none';
+    ans[1].style.display = 'none';
+}
+
+function loss() {
+    const Div = document.querySelector("#q");
+    Div.textContent = 'O нет. Хочешь добавить это человека?';
+    const ans = document.querySelectorAll('.answ_btn');
+    ans[0].style.display = 'none';
+    ans[1].style.display = 'none';
+    const btn = document.querySelectorAll(".game_btn");
+    btn[2].style.display = 'block';
 }
 

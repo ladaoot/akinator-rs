@@ -4,8 +4,8 @@
   line-height: 24px;
   font-weight: 400;
 
-  color: #0f0f0f;
-  background-color: #f6f6f6;
+  color: #16354D;
+  background-color: #E4E5EA;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -50,15 +50,34 @@ a:hover {
   color: #535bf2;
 }
 
-.game_btn{
+.game_btn {
   display: none;
+}
+
+.answ_btn {
+  display: none;
+}
+
+#q {
+  background-color: #6B99C3;
+  border-radius: 20px;
+  padding: 2%;
+  margin: auto;
+  color: #0C151C;
 }
 
 h1 {
   text-align: center;
 }
+
 h3 {
   text-align: center;
+}
+
+
+
+input {
+  margin: 5%;
 }
 
 input,
@@ -69,8 +88,8 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
+  color: #16354D;
+  background-color: #D2D2D4;
   transition: border-color 0.25s;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 }
@@ -82,17 +101,20 @@ button {
 }
 
 button:hover {
-  border-color: #396cd8;
+  border-color: #6B99C3;
 }
+
 button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
+  border-color: #D2D2D4;
+  background-color: #6B99C3;
 }
 
 input,
 button {
   outline: none;
 }
+
+
 
 input {
   margin-right: 5px;
@@ -113,6 +135,7 @@ input {
     color: #ffffff;
     background-color: #0f0f0f98;
   }
+
   button:active {
     background-color: #0f0f0f69;
   }
