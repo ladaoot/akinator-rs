@@ -23,10 +23,6 @@ async function game(x) {
     btn[2].style.display = 'none';
     btn[0].disabled = false;
     btn[1].disabled = false;
-
-
-
-
 }
 
 function goBack() {
