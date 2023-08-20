@@ -218,7 +218,7 @@ fn isStart() -> bool {
 }
 
 #[tauri::command]
-fn save(name: String) -> Result<String, String> {
+fn save(name: String) ->  String {
     unsafe {
         let per = Person {
             name: name,
@@ -227,7 +227,7 @@ fn save(name: String) -> Result<String, String> {
 
         get_all_persons();
         if ACTUAL_PERSON.contains(&per) {
-            return Result::Ok("alredy exists".to_string());
+            return "alredy exists".to_string();
         }
 
         let person_path: PathBuf = ["../data", "persons.json"].iter().collect();
@@ -245,7 +245,7 @@ fn save(name: String) -> Result<String, String> {
         );
         person_json.push(']');
         write(person_path, person_json).expect("Can't write to file");
-        return Result::Ok("ok".to_string());
+        return "ok".to_string();
     }
 }
 

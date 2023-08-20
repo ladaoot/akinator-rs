@@ -2,12 +2,8 @@ const { invoke } = window.__TAURI__.tauri;
 
 
 function start() {
-    // game(1);
     window.onload = game(0);
     window.location.href = 'game.html';
-
-
-
 }
 
 async function game(x) {
